@@ -1,0 +1,43 @@
+// Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps, leave this file empty.
+
+== Postdeployment steps
+
+Use the URL displayed in the *Outputs* tab for the nested Dynatrace stack to view the resources that were created.
+
+[#postdeploy1]
+.Stack output showing the Elastic IP address that is used to access the Dynatrace Managed Console
+image::../docs/deployment_guide/images/image2.png[postdeploy]
+
+==== Test the Deployment
+
+. Use > obtained from the *Outputs* tab to access the Dynatrace Managed cluster console. Ignore any browser warnings regarding TLS certificate.
+
+[#postdeploy2]
+.Ignore browser security warnings
+image::../docs/deployment_guide/images/image3.png[postdeploy]
+
+[arabic, start=2]
+. Log in to the Dynatrace console, using *admin* as the user name and the password that you entered in the Quick Start *AdminPassword* parameter.
+
+[#postdeploy3]
+.Dynatrace Managed login screen
+image::../docs/deployment_guide/images/image4.png[postdeploy]
+
+[arabic, start=3]
+. On the Dynatrace UI Home screen, you can verify the summary of your setup.
+
+[#postdeploy4]
+.Dynatrace Managed Home screen after successful login
+image::../docs/deployment_guide/images/image5.png[postdeploy]
+
+[arabic, start=4]
+. From the Home screen, you can navigate to the configuration of each node. You can change the IP address for each node to one of Elastic IP addresses of the Network Load Balancer. After doing this you will be able to use the pre-generated domain name to access the cluster UI.
+. Proceed with other configuration adjustments if needed.
+
+== Best Practices Using the Dynatrace Managed Cluster on AWS
+
+=== High Availability and Performance
+
+We recommend that you use three Availability Zones if possible and run at least three nodes to ensure high availability of the cluster. If you decide to start very small and use only one node, we still recommend that you configure the VPC with three Availability Zones and three public and private subnets. You can add nodes to the cluster, but you won’t be able to easily reconfigure the VPC after it has been created.
+
+While you don’t need to come up with the exact cluster sizing initially, we recommend getting acquainted with the https://www.dynatrace.com/support/help/deploy-dynatrace/managed/installation/hardware-and-operating-system-requirements/[Dynatrace Managed hardware requirements].

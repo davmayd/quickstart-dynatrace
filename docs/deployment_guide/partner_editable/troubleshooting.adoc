@@ -1,0 +1,90 @@
+// Add any unique troubleshooting steps here.
+
+For troubleshooting common Partner Solution issues, refer to the https://fwd.aws/rA69w?[AWS Partner Solution General Information Guide^] and https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting CloudFormation^].
+
+For Dynatrace-specific questions, see the https://www.dynatrace.com/services-support/#get-support[Dynatrace support site].
+
+=== Security
+
+==== Network Access to the Dynatrace Managed Cluster
+
+Dynatrace Managed UI can be accessed on port 443 (HTTPS). Dynatrace Managed is also exposing secondary HTTPS port 8443, which is needed for monitoring data collection.
+
+Public access to the cluster is facilitated by the Network Load Balancer. By default, both ports are open without restrictions. If this is not desirable, you will need to adjust the settings in the security group.
+
+SSH access (port 22) is possible only via the bastion host. Bastion host instances and cluster node instances are configured using the same SSH key, which is provided during Quick Start deployment.
+
+==== Domain and TLS Certificate
+
+When accessing the cluster initially, you might need to ignore the browser security warnings that are caused by a TLS certificate mismatch.
+
+For each Dynatrace Managed cluster, a domain is created in the form _abc123.dynatrace-managed.com_, and a TLS certificate is configured. The setup uses the private IP addresses of the Amazon EC2 instances as domain records. The domain setup is done by Dynatrace and is not part of Quick Start deployment per se. For the Quick Start deployment, you would typically want to use the public IP addresses of the Network Load Balancer instead. You can reconfigure the IP address used for each node in Dynatrace Managed UI.
+
+However, if the private IP address of the EC2 instance is not accessible—which is the case initially if you create the new VPC—the only way to access the cluster UI initially is by using an IP address instead of the domain name.
+
+==== Outbound Connections to Dynatrace Mission Control
+
+To facilitate automatic updates of Dynatrace Managed and help in supporting the installations, the Dynatrace Managed cluster periodically sends requests to the https://mcsvc.dynatrace.com/[Dynatrace Mission Control API endpoint].
+
+You can control what data is sent by changing the settings in the *Pro-active support* section of Preferences in the Dynatrace Managed UI.
+
+[#troubleshooting1]
+image::../docs/deployment_guide/images/image6.png[postdeploy]
+
+==== IAM Capabilities Needed by the Quick Start
+
+The Dynatrace Managed cluster Quick Start requires IAM capabilities for the creation of the CloudFormation stack. The IAM capabilities are needed to create the IAM Role and instance profile for the Amazon EC2 instances running Dynatrace Managed. The associated permissions do not go beyond Amazon S3 read access (restricted to the Quick Start bucket resource) and AWS Systems Manager access (restricted to parameters created by this Quick Start).
+
+==== Parameters Stored in AWS Systems Manager
+
+The Dynatrace Managed Cluster Quick Start uses AWS Systems Manager Parameter Store to persist parameters that are needed for cluster bootstrapping. One of the parameters—*seed-token*—is a Dynatrace cluster API token that should be kept secure. If you have concerns about restricting access to Parameter Store, you can remove the token parameter. Note, however, that you will need to provide it again should you decide to extend the number of cluster nodes by https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks.html[updating the CloudFormation stack].
+
+=== Maintaining the Dynatrace Managed Cluster
+
+For detailed instructions on how to configure and maintain Dynatrace Managed cluster, refer to the https://www.dynatrace.com/support/help/deploy-dynatrace/managed/managed-hub/[Dynatrace documentation], which covers some maintenance details that are specific to this Quick Start.
+
+While this Quick Start was designed primarily with initial cluster bootstrapping in mind, it is possible to alter the setup through https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks.html[AWS CloudFormation updates]. Not all parameters may be safely changed though, and care must be taken to avoid data loss.
+
+==== Protecting the Cluster against Inadvertent Termination
+
+Because the Quick Start AWS CloudFormation template creates multiple nested stacks, it is not easy to determine if a nested resource is going to be replaced by a CloudFormation template update. To prevent inadvertent replacement of Amazon EC2 instances with the Dynatrace Manage cluster, it is paramount to apply proper stack policy to nested stacks if planning on doing CloudFormation stack updates.
+
+==== Scaling Out
+
+Because this Quick Start does not use Amazon EC2 Auto Scaling, you might need to add more nodes to the cluster if the initial sizing is not sufficient. You can add nodes by updating the AWS CloudFormation stack using the original template and increasing the value of the *NumNodes* parameter. The default value is 3, and the maximum number of nodes is currently capped at 6.
+
+==== Scaling In
+
+You can reduce the number of nodes in the cluster by using AWS CloudFormation, but we recommend that you remove only one node at a time to ensure the monitoring data can get replicated to remaining nodes. To remove a node, use the following steps:
+
+[arabic]
+. Disable the last node of the cluster by using the Dynatrace UI.
+
+The disabled node no longer accepts monitoring data, but it can be enabled again.
+
+[arabic, start=4]
+. Remove the last node from the cluster by using the Dynatrace UI.
+. Update the AWS CloudFormation stack with the *NumNodes* parameter value decreased by one.
+
+*Note* If you plan to remove another node from larger setups, you might need to wait a couple of hours before the data is resharded to avoid data loss.
+
+==== Changing the Instance Type
+
+You can switch to another instance type for cluster nodes by updating the AWS CloudFormation stack and changing the *DynatraceInstanceType* parameter. Make sure that the new instance type has at least as much memory as previous one. Otherwise, the services of the cluster might not be able to start. To avoid data loss, it is paramount to confirm that changing the instance type does not involve instance replacement by AWS CloudFormation.
+
+==== Resizing the Amazon EBS Volumes
+
+Resizing the Amazon EBS volumes for this Quick Start by using AWS CloudFormation update is currently *not* supported. Attempting to change the size of any Amazon EBS volume configured by AWS CloudFormation will trigger the replacement of Amazon EC2 instances and will result in data loss. If disk resize is needed, do the following:
+
+[arabic]
+. You must first resize the EBS volume by following the instructions at https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/console-modify.html.
+
+[arabic, start=6]
+. Then resize the file system on each cluster node. All the volumes have been configured using LVM and can be resized without downtime. Use SSH to log in to each Amazon EC2 instance and run the _/tmp/resize_lvm.sh_ script with sudo.
+
+==== Changing Other Parameters
+
+This Quick Start does not support changing any other cluster or VPC-related parameters by using AWS CloudFormation update.
+
+// == Resources
+// Uncomment section and add links to any external resources that are specified by the partner.

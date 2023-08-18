@@ -1,0 +1,5 @@
+//Include any predeployment steps here, such as signing up for a Marketplace AMI or making any changes to a partner account. If there are no predeployment steps, leave this file empty.
+
+== Predeployment steps
+
+If you’re deploying the Dynatrace Managed cluster into an existing VPC, make sure that your VPC has at least two but preferably three private subnets in different Availability Zones. These subnets require http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat.html[NAT gateways or NAT instances] in their route tables, to allow the instances to download packages and software without exposing them to the internet. You will also need the domain name option configured in the DHCP options as explained in the http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_DHCP_Options.html[Amazon VPC documentation]. You will be prompted for your VPC settings when you launch the Quick Start.

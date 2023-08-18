@@ -1,0 +1,13 @@
+This guide covers the information you need to deploy the {partner-product-name} Partner Solution in the AWS Cloud.
+
+This Partner Solution reference deployment guide provides step-by-step instructions for deploying a Dynatrace Managed cluster on the Amazon Web Services (AWS) Cloud.
+
+Dynatrace is available in two deployment models: SaaS and Managed. In the SaaS model, you do not need to deploy the Dynatrace cluster. In the Managed model, you can run the Dynatrace cluster in the infrastructure of your choosing and retain full control of the data.
+
+This Quick Start is for IT infrastructure architects, administrators, and DevOps professionals who want to use the Dynatrace Managed model for deployments and run their cluster in the AWS Cloud.
+
+==== Dynatrace Managed Cluster on AWS
+
+Dynatrace is an all-in-one performance-monitoring solution. You can use a single platform to analyze application performance throughout your application’s full stack, down to each individual transaction across all layers and technologies.
+
+Using the Quick Start to deploy the Dynatrace Managed cluster in AWS greatly simplifies the deployment process. It enables the failover capacities by leveraging multiple Availability Zones, a Network Load Balancer, and an Amazon Elastic Compute Cloud (Amazon EC2) automatic recovery mechanism. It lets you easily scale the cluster both vertically and horizontally.
